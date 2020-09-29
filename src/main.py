@@ -60,6 +60,7 @@ class Main:
                                     telegram.edit_message(msg_id, chat_id, tarea)
                                     if tarea.isdigit():
                                         tarea_checker = False
+                                        telegram.send_initial_menu(chat_id)
                                 try:
                                     if cuerpo["text"]:
                                         message = cuerpo["text"].lower()

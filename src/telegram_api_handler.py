@@ -32,15 +32,23 @@ class TelegramApi:
     def edit_message(self, msg_id, chat_id, option):
         if option == "limpieza":
             pregunta = "¿Que cantidad de horas necesita?"
-            keyBoard = '{"inline_keyboard": [[{"text": "2 horas", "callback_data": 2}], [{"text": "4 horas", ' \
-                       '"callback_data": 4}], [{"text": "6 horas", "callback_data": 6}]]} '
+            keyBoard = '{"inline_keyboard": [[{"text": "2 horas", "callback_data": 2}], ' \
+                       '[{"text": "4 horas", "callback_data": 4}], ' \
+                       '[{"text": "6 horas", "callback_data": 6}], ' \
+                       '[{"text": "<< Atrás", "callback_data": "atras"}]]} '
             url = self.base + f"editMessageText?chat_id={chat_id}&message_id={msg_id}&text={pregunta}&reply_markup={keyBoard}"
         elif option.isdigit():      # horas de limpieza
             texto = f"Perfecto, ahora mismo enviamos a un equipo para que limpie {option} horas, buen dia"
             url = self.base + f"editMessageText?chat_id={chat_id}&message_id={msg_id}&text={texto}"
+        elif option == "atras":
+            pregunta = "¿Qué quieres hacer?"
+            keyBoard = '{"inline_keyboard": [[{"text": "Limpieza", "callback_data": "limpieza"}], [{"text": "otro", ' \
+                       '"callback_data": "otro"}]]} '
+            url = self.base + f"editMessageText?chat_id={chat_id}&message_id={msg_id}&text={pregunta}&reply_markup={keyBoard}"
         else:
             texto = "escriba en que puedo ayudarle a ver si puedo encontrar alguna solución"
-            url = self.base + f"editMessageText?chat_id={chat_id}&message_id={msg_id}&text={texto}"
+            keyBoard = '{"inline_keyboard":[{"text": "<< Atrás", "callback_data": "atras"}]]}'
+            url = self.base + f"editMessageText?chat_id={chat_id}&message_id={msg_id}&text={texto}&reply_markup={keyBoard}"
         try:
             print(requests.get(url).content)
         except:
