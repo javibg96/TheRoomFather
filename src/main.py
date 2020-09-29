@@ -20,17 +20,19 @@ class Main:
             if len(updates) != 0:
                 logging.info(updates)
             if updates:
-                print(updates)
+                # print(updates)
                 for item in updates:
                     update_id = item["update_id"]
                     try:
                         cuerpo = item["message"]
                         chat_id = cuerpo["chat"]["id"]
                         tarea = "texto"
+                        msg_id = chat_id
                     except:
                         # cuerpo = item["edited_message"]
                         cuerpo = item["callback_query"]["message"]
                         chat_id = cuerpo["chat"]["id"]
+                        msg_id = item["callback_query"]["message"]["message_id"]
                         tarea = item["callback_query"]["data"]
                         tarea_checker = True
                         # aqui ya tenemos la tarea que queremos
@@ -53,11 +55,11 @@ class Main:
                                 "document" not in cuerpo and "video" not in cuerpo:
                             try:
                                 if not tarea_checker:
-                                    telegram.send_menu(chat_id)
+                                    telegram.send_initial_menu(chat_id)
                                 else:
-                                    telegram.send_message(f"Tarea {tarea} recibida, nos encargaremos de ello lo antes "
-                                                          f"posible", chat_id)
-
+                                    telegram.edit_message(msg_id, chat_id, tarea)
+                                    if tarea.isdigit():
+                                        tarea_checker = False
                                 try:
                                     if cuerpo["text"]:
                                         message = cuerpo["text"].lower()
@@ -69,6 +71,7 @@ class Main:
                                     print(cuerpo)
 
                                 if "text" in cuerpo and cuerpo["text"].lower() == "/adios":
+                                    tarea_checker = False
                                     print()  # reiniciariamos el bot para otra ocasion
                                     telegram.send_menu(chat_id)
                             except:
