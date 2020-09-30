@@ -24,42 +24,27 @@ class TelegramApi:
         r = requests.get(url)
         return json.loads(r.content)
 
-    def send_message(self, msg, chat_id):
-        url = self.base + f"sendMessage?chat_id={chat_id}&text={msg}"
+    def send_message(self, msg, chat_id, keyBoard=None):
+        if keyBoard:
+            url = self.base + f"sendMessage?chat_id={chat_id}&text={msg}&reply_markup={keyBoard}"
+        else:
+            url = self.base + f"sendMessage?chat_id={chat_id}&text={msg}"
         if msg is not None:
             requests.get(url)
 
-    def edit_message(self, msg_id, chat_id, option):
-        if option == "limpieza":
-            pregunta = "¿Que cantidad de horas necesita?"
-            keyBoard = '{"inline_keyboard": [[{"text": "2 horas", "callback_data": 2}], ' \
-                       '[{"text": "4 horas", "callback_data": 4}], ' \
-                       '[{"text": "6 horas", "callback_data": 6}], ' \
-                       '[{"text": "<< Atrás", "callback_data": "atras"}]]} '
-            url = self.base + f"editMessageText?chat_id={chat_id}&message_id={msg_id}&text={pregunta}&reply_markup={keyBoard}"
-        elif option.isdigit():      # horas de limpieza
-            texto = f"Perfecto, ahora mismo enviamos a un equipo para que limpie {option} horas, buen dia"
-            url = self.base + f"editMessageText?chat_id={chat_id}&message_id={msg_id}&text={texto}"
-        elif option == "atras":
-            pregunta = "¿Qué quieres hacer?"
-            keyBoard = '{"inline_keyboard": [[{"text": "Limpieza", "callback_data": "limpieza"}], [{"text": "otro", ' \
-                       '"callback_data": "otro"}]]} '
-            url = self.base + f"editMessageText?chat_id={chat_id}&message_id={msg_id}&text={pregunta}&reply_markup={keyBoard}"
-        else:
-            texto = "escriba en que puedo ayudarle a ver si puedo encontrar alguna solución"
-            keyBoard = '{"inline_keyboard":[{"text": "<< Atrás", "callback_data": "atras"}]]}'
+    def edit_message(self, msg_id, chat_id, texto, keyBoard=None):
+        if keyBoard:
             url = self.base + f"editMessageText?chat_id={chat_id}&message_id={msg_id}&text={texto}&reply_markup={keyBoard}"
+        else:
+            url = self.base + f"editMessageText?chat_id={chat_id}&message_id={msg_id}&text={texto}"
         try:
             print(requests.get(url).content)
         except:
             logging.exception("Error traceback")
 
-    def send_initial_menu(self, chat_id):
-        pregunta = "Bienvenido, ¿Qué quieres hacer?"
-        keyBoard = '{"inline_keyboard": [[{"text": "Limpieza", "callback_data": "limpieza"}], [{"text": "otro", ' \
-                   '"callback_data": "otro"}]]} '
-        url = self.base + f"sendMessage?chat_id={chat_id}&text={pregunta}&reply_markup={keyBoard}"
-        try:
-            print(requests.get(url).content)
-        except:
-            logging.exception("Error traceback")
+    def delete_message(self, chat_id, msg_id):
+        url = self.base + f"deleteMessage?chat_id={chat_id}&message_id={msg_id}"
+        r = requests.get(url)
+        response = json.loads(r.content)
+        if not response["ok"]:
+            print(response)

@@ -1,7 +1,20 @@
-{
-"666666666": {
-  "nombre": "Cliente de prueba",
-  "Habitacion": "123456789"
-}
-
+﻿{
+    "555555555": {
+        "Habitacion": "987654321",
+        "nombre": "Cliente de prueba2",
+        "password": "123456789",
+        "permiso": "Public"
+    },
+    "666666666": {
+        "Habitacion": "123456789",
+        "nombre": "Cliente de prueba",
+        "password": "123456789",
+        "permiso": "Admin"
+    },
+    "927100626": {
+        "Habitacion": "avenida de burgos 4",
+        "nombre": "javier",
+        "password": "1234235",
+        "permiso": "Admin"
+    }
 }
