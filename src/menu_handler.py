@@ -33,7 +33,7 @@ def registro(chat_id, msg_id, option):
                    '[{"text": "No", "callback_data":"nohab"}]]} '
         TelegramApi().send_message(texto, chat_id, keyBoard)
     elif option == "hab":
-        texto = "Introduzca por favor la direccion del piso"
+        texto = "Introduzca por favor la direccion del piso (ej. calle menganito 1)"
         TelegramApi().edit_message(msg_id, chat_id, texto)
     elif option == "w_hab":
         texto = "Dirección del piso introducida no valida, intentelo de nuevo por favor"
@@ -64,18 +64,12 @@ def registered_client_menu(chat_id, option, room, client_name=None):
     TelegramApi().send_message(pregunta, chat_id, keyBoard)
 
 
-def menu_handler(chat_id, msg_id, tarea, user):
-    if tarea == "texto":
+def menu_handler(chat_id, msg_id, option, usuario):
+    print(f"menu option: {option}")
+    if option == "inicio":
         send_initial_menu(chat_id)
-    else:
-        if tarea == "registro_completado":
-            registro_db(user)
-        option_selector(chat_id, msg_id, tarea, user)
 
-
-def option_selector(chat_id, msg_id, option, usuario=None):
-    print(option)
-    if option == "registro" or "password" in option or "hab" in option:
+    elif option == "registro" or "password" in option or "hab" in option:
         registro(chat_id, msg_id, option)
 
     elif option in ["atras", "cliente_registrado"]:
@@ -85,30 +79,40 @@ def option_selector(chat_id, msg_id, option, usuario=None):
             [usuario[2], usuario[3]] = [usu_temp["password"], usu_temp["piso"]]
             print(usuario)
         registered_client_menu(chat_id, option, usuario[3], usuario[1])
+
     elif option == "registro_completado":
         print(usuario)
         registered_client_menu(chat_id, option, usuario[3])
+
     else:
         keyBoard = '{"inline_keyboard":[[{"text": "<< Atrás", "callback_data": "atras"}]]}'
+
         if option == "limpieza":
             texto = "¿Que cantidad de horas necesita?"
             keyBoard = '{"inline_keyboard": [[{"text": "1 hora", "callback_data": "1"}], ' \
                        '[{"text": "2 horas", "callback_data": "2"}],' \
                        '[{"text": "3 horas", "callback_data": "3"}]]}'
+
         elif option == "arreglos":
             texto = "¿Que tipo de arreglo necesita?"
             keyBoard = '{"inline_keyboard": [[{"text": "Fontanero", "callback_data": "fontanero"}], ' \
                        '[{"text": "Electricista", "callback_data": "electricista"}],' \
                        '[{"text": "Pintor", "callback_data": "pintor"}],' \
                        '[{"text": "Cerrajero", "callback_data": "cerrajero"}]]}'
+
         elif option in ["fontanero", "electricista", "pintor", "cerrajero"]:
             texto = f"en seguida mandamos a un {option} a su domicilio, que tenga un bien día"
+
         elif option.isdigit():  # horas de limpieza
             texto = f"Perfecto, ahora mismo enviamos a un equipo para que limpie {option} horas, buen dia"
+
         elif option == "check_out":
             checkout(usuario)
             texto = "Perfecto, ya hemos actualizado la base de datos, que tenga un buen día"
+
         else:
             texto = "Escriba en que puedo ayudarle a ver si puedo encontrar alguna solución"
 
         TelegramApi().edit_message(msg_id, chat_id, texto, keyBoard)
+
+
