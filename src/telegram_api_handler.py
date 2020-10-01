@@ -38,7 +38,8 @@ class TelegramApi:
         else:
             url = self.base + f"editMessageText?chat_id={chat_id}&message_id={msg_id}&text={texto}"
         try:
-            print(requests.get(url).content)
+            # print(requests.get(url).content)  # para testing
+            requests.get(url)
         except:
             logging.exception("Error traceback")
 
