@@ -10,6 +10,11 @@
         "password": "123456789",
         "permiso": "Admin",
         "piso": "123456789"
+    },
+    "927100626": {
+        "nombre": "Javier Blasco",
+        "password": "1234567",
+        "permiso": "Public",
+        "piso": null
     }
-
 }

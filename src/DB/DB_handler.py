@@ -12,7 +12,6 @@ def check_room_availability(piso):
 
 def check_password(password):
     correct = False
-    print(f"password: {password}")
     if len(password) >= 6:
         correct = True
     return correct

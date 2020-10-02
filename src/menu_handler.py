@@ -14,7 +14,7 @@ def registro(chat_id, msg_id, option):
     if option == "registro":
         texto = "escriba nombre de usuario"
         TelegramApi().edit_message(msg_id, chat_id, texto, keyBoard)
-    elif option == "password":
+    elif option == "usuario":
         texto = "nombre de usuario guardado, ahora elija su contraseña"
         TelegramApi().send_message(texto, chat_id)
     elif option == "n_password":
@@ -26,8 +26,8 @@ def registro(chat_id, msg_id, option):
     elif option == "w_password":
         texto = "contraseña no válida, intentelo de nuevo (la contraseña debe contener al menos 6 caracteres)"
         TelegramApi().send_message(texto, chat_id)
-    elif option == "reg_hab":
-        TelegramApi().delete_message(chat_id, msg_id)
+    elif option == "g_password":
+        TelegramApi().delete_message(chat_id, msg_id)   # en siguiente version cambiar esto por editar contraseña por *
         texto = "Contraseña almacenada, ¿Tiene alquilada alguna habitación con nosotros?"
         keyBoard = '{"inline_keyboard":[[{"text": "Si", "callback_data": "hab"}],' \
                    '[{"text": "No", "callback_data":"nohab"}]]} '
@@ -39,11 +39,11 @@ def registro(chat_id, msg_id, option):
         texto = "Dirección del piso introducida no valida, intentelo de nuevo por favor"
         TelegramApi().send_message(texto, chat_id)
     else:
-        texto = "Datos almacenados en nuestra base de datos"
+        texto = "Datos almacenados en nuestra base de datos"        # registro completado
         TelegramApi().edit_message(msg_id, chat_id, texto)
 
 
-def registered_client_menu(chat_id, option, room, client_name=None):
+def registered_client_menu(chat_id, tarea, room, client_name=None):
     if room:
         keyBoard = '{"inline_keyboard": [[{"text": "Dejar piso (Check out)", "callback_data": "check_out"}], ' \
                    '[{"text": "Limpiar piso", "callback_data": "limpieza"}], ' \
@@ -54,7 +54,7 @@ def registered_client_menu(chat_id, option, room, client_name=None):
         keyBoard = '{"inline_keyboard": [[{"text": "Estoy alquilando un piso", "callback_data": "hab"}],' \
                    '[{"text": "actualizar contraseña", "callback_data": "act_pass"}],' \
                    '[{"text": "Otro", "callback_data": "otro"}]]} '
-    if option == "registro_completado":
+    if tarea == "new_cliente_registrado":
         pregunta = "¿Qué quieres hacer ahora?"
         texto = "Registro completado, Muchas gracias"
         TelegramApi().send_message(texto, chat_id)
@@ -69,23 +69,23 @@ def menu_handler(chat_id, msg_id, option, usuario):
     if option == "inicio":
         send_initial_menu(chat_id)
 
-    elif option == "registro" or "password" in option or "hab" in option:
+    elif option == "registro" or "password" in option or "usuario" in option or option in ["hab", "w_hab", "nohab"]:
         registro(chat_id, msg_id, option)
 
-    elif option in ["atras", "cliente_registrado"]:
-        if option == "atras":
+    elif option in ["reinicio", "cliente_registrado", "atras", "new_cliente_registrado"]:
+        if option == "atras" or option == "reinicio":
             TelegramApi().delete_message(chat_id, msg_id)
-            usu_temp = get_client_info(usuario[0])
-            [usuario[2], usuario[3]] = [usu_temp["password"], usu_temp["piso"]]
-            print(usuario)
+            usuario = get_client_info(usuario[0])[0]
         registered_client_menu(chat_id, option, usuario[3], usuario[1])
 
-    elif option == "registro_completado":
+    elif option == "g_hab":
+        texto = "Datos almacenados, Registro completado."
+        TelegramApi().send_message(texto, chat_id)
+        usuario[3] = "Piso temporal"        # se coloca el de verdad al llegar a la siguiente funcion
         print(usuario)
-        registered_client_menu(chat_id, option, usuario[3])
-
+        registered_client_menu(chat_id, option, usuario[3], usuario[1])
     else:
-        keyBoard = '{"inline_keyboard":[[{"text": "<< Atrás", "callback_data": "atras"}]]}'
+        keyBoard = '{"inline_keyboard":[[{"text": "<< Atrás", "callback_data": "reinicio"}]]}'
 
         if option == "limpieza":
             texto = "¿Que cantidad de horas necesita?"
@@ -106,9 +106,10 @@ def menu_handler(chat_id, msg_id, option, usuario):
         elif option.isdigit():  # horas de limpieza
             texto = f"Perfecto, ahora mismo enviamos a un equipo para que limpie {option} horas, buen dia"
 
-        elif option == "check_out":
+        elif option == "check_out":     # mini bug en pasar de reg completado a check out, revisar
             checkout(usuario)
             texto = "Perfecto, ya hemos actualizado la base de datos, que tenga un buen día"
+            keyBoard = '{"inline_keyboard":[[{"text": "<< Atrás", "callback_data": "reinicio"}]]}'
 
         else:
             texto = "Escriba en que puedo ayudarle a ver si puedo encontrar alguna solución"

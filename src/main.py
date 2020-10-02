@@ -3,7 +3,7 @@ import pandas as pd
 from src.telegram_api_handler import TelegramApi
 from src.updates_handler import updater
 from src.core import procesamiento_info
-from src.DB.DB_handler import get_client_info
+from src.DB.DB_handler import get_client_info, check_password, check_room_availability
 from src.menu_handler import menu_handler
 from time import gmtime
 
@@ -24,16 +24,17 @@ class Main:
         # [update_id, update_flag, cuerpo, chat_id, msg_id, tarea]
 
         while True:
-            try:
-                tarea_ant = tarea
-                updater_values = updater(telegram, updater_values)
 
+            try:
+                tarea_ant = updater_values[5]
+                [updater_values, tarea_ant] = updater(telegram, updater_values, tarea_ant)
                 [cuerpo, chat_id, msg_id, tarea] = updater_values[2:6]
                 if tarea in ["inicio", "cliente_registrado"]:
                     inicio = True
             except KeyError:
                 logging.exception("Error traceback")
                 raise
+
             print(f"tarea anterior: {tarea_ant},  tarea actual: {tarea}")
 
             if cuerpo and inicio and updater_values[1]:
@@ -47,10 +48,20 @@ class Main:
                                     if get_client_info(client_id):
                                         [user, tarea] = get_client_info(client_id)
                                         client_flag = True
-
+                                if "password" in tarea:
+                                    if check_password(cuerpo["text"]):
+                                        tarea = "g_password"
+                                    else:
+                                        tarea = "w_password"
+                                elif tarea == "reg_hab":
+                                    if check_room_availability(cuerpo["text"]):
+                                        tarea = "g_hab"
+                                    else:
+                                        tarea = "w_hab"
                                 # esta funcion no devuelve nada, es solo para enviar los mensajes
                                 menu_handler(chat_id, msg_id, tarea, user)
-                                [user, tarea] = procesamiento_info(cuerpo, tarea, user)
+                                [user, updater_values[5]] = procesamiento_info(cuerpo, tarea, user)
+                                # print(f"tarea procesada:{updater_values[5]}")
                             except:
                                 logging.exception("Error traceback")
                         elif "document" in cuerpo:

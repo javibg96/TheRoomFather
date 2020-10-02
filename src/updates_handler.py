@@ -1,7 +1,7 @@
 import logging
 
 
-def updater(telegram, updater_values):
+def updater(telegram, updater_values, tarea_ant):
     [update_id, update_flag, cuerpo, chat_id, msg_id, tarea] = updater_values
     updates = telegram.get_updates(offset=update_id)
     updates = updates["result"]
@@ -15,13 +15,13 @@ def updater(telegram, updater_values):
             try:
                 if "message" in item:
                     cuerpo = item["message"]
-                    [chat_id, msg_id, tarea] = cuerpo_handler(cuerpo)
+                    [chat_id, msg_id, tarea_ant, tarea] = cuerpo_handler(cuerpo, tarea_ant, tarea)
                 elif "callback_query" in item:
                     cuerpo = item["callback_query"]
-                    [chat_id, msg_id, tarea] = cuerpo_handler(cuerpo)
+                    [chat_id, msg_id, tarea_ant, tarea] = cuerpo_handler(cuerpo, tarea_ant, tarea)
                 elif "edited_message" in item:
                     cuerpo = item["edited_message"]  # a partir de aqui copy paste de message
-                    [chat_id, msg_id, tarea] = cuerpo_handler(cuerpo)
+                    [chat_id, msg_id, tarea_ant, tarea] = cuerpo_handler(cuerpo, tarea_ant, tarea)
 
                 else:  # solucion temporal
                     cuerpo = item
@@ -50,20 +50,25 @@ def updater(telegram, updater_values):
         if str(element["type"]) == "bot_command":
             logging.info("bot command detected")
     updater_values = [update_id, update_flag, cuerpo, chat_id, msg_id, tarea]
-    return updater_values
+    return updater_values, tarea_ant
 
 
-def cuerpo_handler(cuerpo, tarea="texto"):
-
-    if "message" in cuerpo:
+def cuerpo_handler(cuerpo, tarea_ant, tarea="texto"):
+    if "message" in cuerpo:     # esto significa que es menu no mensaje de texto
         tarea = cuerpo["data"]
         cuerpo = cuerpo["message"]
+    elif tarea == "atras":
+        tarea = tarea_ant
+        tarea_ant = "texto"
+    else:
+        tareas_texto = {"registro": "usuario", "usuario": "password", "w_hab": "reg_hab", "hab": "reg_hab",
+                        "w_password": "password", "texto": "texto", "inicio": "inicio"}
+        tarea = tareas_texto[tarea]
 
     chat_id = cuerpo["chat"]["id"]
     msg_id = cuerpo["message_id"]
 
     if cuerpo["text"].lower() == "/start":
         logging.info("Wake up protocol, let's check if is someone known")
-        tarea = "inicio"
 
-    return chat_id, msg_id, tarea
+    return chat_id, msg_id, tarea_ant, tarea
