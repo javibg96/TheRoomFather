@@ -132,5 +132,7 @@ dmypy.json
 #.exe metadata
 build
 
-# Creds and base path
+# Creds
 src/config.cfg
+config.cfg
+# src/DB # añadir cuando tengamos valores importantes

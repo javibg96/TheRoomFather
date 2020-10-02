@@ -24,17 +24,28 @@ class TelegramApi:
         r = requests.get(url)
         return json.loads(r.content)
 
-    def send_message(self, msg, chat_id):
-        url = self.base + f"sendMessage?chat_id={chat_id}&text={msg}"
+    def send_message(self, msg, chat_id, keyBoard=None):
+        if keyBoard:
+            url = self.base + f"sendMessage?chat_id={chat_id}&text={msg}&reply_markup={keyBoard}"
+        else:
+            url = self.base + f"sendMessage?chat_id={chat_id}&text={msg}"
         if msg is not None:
             requests.get(url)
 
-    def send_menu(self, chat_id):
-        pregunta = "Bienvenido, ¿Qué quieres hacer?"
-        keyBoard = '{"inline_keyboard": [[{"text": "Limpieza", "callback_data": "limpieza"}], [{"text": "otro", ' \
-                   '"callback_data": "otro"}]]} '
-        url = self.base + f"sendMessage?chat_id={chat_id}&text={pregunta}&reply_markup={keyBoard}"
+    def edit_message(self, msg_id, chat_id, texto, keyBoard=None):
+        if keyBoard:
+            url = self.base + f"editMessageText?chat_id={chat_id}&message_id={msg_id}&text={texto}&reply_markup={keyBoard}"
+        else:
+            url = self.base + f"editMessageText?chat_id={chat_id}&message_id={msg_id}&text={texto}"
         try:
-            print(requests.get(url).content)
+            # print(requests.get(url).content)  # para testing
+            requests.get(url)
         except:
             logging.exception("Error traceback")
+
+    def delete_message(self, chat_id, msg_id):
+        url = self.base + f"deleteMessage?chat_id={chat_id}&message_id={msg_id}"
+        r = requests.get(url)
+        response = json.loads(r.content)
+        if not response["ok"]:
+            print(response)

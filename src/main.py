@@ -1,6 +1,10 @@
 import logging
 import pandas as pd
 from src.telegram_api_handler import TelegramApi
+from src.updates_handler import updater
+from src.core import procesamiento_info
+from src.DB.DB_handler import get_client_info, check_password, check_room_availability
+from src.menu_handler import menu_handler
 from time import gmtime
 
 # logging basic config
@@ -10,85 +14,67 @@ logging.basicConfig(filename='Bot_logs.log', filemode='a', format=FORMAT, level=
 
 class Main:
     def __init__(self):
+        logging.info("STARTING BOT......")
         telegram = TelegramApi()
-        update_id = None
-        tarea_checker = False
+        inicio = False
+        user = [None, None, None, None]
+        tarea = "texto"
+        client_flag = False
+        updater_values = [None, False, None, 0, 0, tarea]
+        # [update_id, update_flag, cuerpo, chat_id, msg_id, tarea]
 
         while True:
-            updates = telegram.get_updates(offset=update_id)
-            updates = updates["result"]
-            if len(updates) != 0:
-                logging.info(updates)
-            if updates:
-                print(updates)
-                for item in updates:
-                    update_id = item["update_id"]
-                    try:
-                        cuerpo = item["message"]
-                        chat_id = cuerpo["chat"]["id"]
-                        tarea = "texto"
-                    except:
-                        # cuerpo = item["edited_message"]
-                        cuerpo = item["callback_query"]["message"]
-                        chat_id = cuerpo["chat"]["id"]
-                        tarea = item["callback_query"]["data"]
-                        tarea_checker = True
-                        # aqui ya tenemos la tarea que queremos
 
-                    try:
-                        # Comandos telegram
-                        try:
-                            entities = cuerpo['entities']
-                        except:
-                            entities = []
-                        for element in entities:
-                            # Protocolo de insercion en un grupo
-                            if str(element["type"]) == "bot_command":
-                                logging.info("bot command detected")
+            try:
+                tarea_ant = updater_values[5]
+                [updater_values, tarea_ant] = updater(telegram, updater_values, tarea_ant)
+                [cuerpo, chat_id, msg_id, tarea] = updater_values[2:6]
+                if tarea in ["inicio", "cliente_registrado"]:
+                    inicio = True
+            except KeyError:
+                logging.exception("Error traceback")
+                raise
 
-                    except KeyError:
-                        logging.exception("Error traceback")
+            print(f"tarea anterior: {tarea_ant},  tarea actual: {tarea}")
+
+            if cuerpo and inicio and updater_values[1]:
+                if tarea_ant != tarea:
                     try:
-                        if item and "photo" not in cuerpo and "voice" not in cuerpo and \
-                                "document" not in cuerpo and "video" not in cuerpo:
+                        elementos = ["photo", "voice", "document", "video"]
+                        if all([elemento not in cuerpo for elemento in elementos]):
                             try:
-                                if not tarea_checker:
-                                    telegram.send_menu(chat_id)
-                                else:
-                                    telegram.send_message(f"Tarea {tarea} recibida, nos encargaremos de ello lo antes "
-                                                          f"posible", chat_id)
-
-                                try:
-                                    if cuerpo["text"]:
-                                        message = cuerpo["text"].lower()
-
+                                client_id = str(cuerpo["from"]["id"])
+                                if not client_flag:
+                                    if get_client_info(client_id):
+                                        [user, tarea] = get_client_info(client_id)
+                                        client_flag = True
+                                if "password" in tarea:
+                                    if check_password(cuerpo["text"]):
+                                        tarea = "g_password"
                                     else:
-                                        message = "un mensaje que no se que es"
-                                except:
-
-                                    print(cuerpo)
-
-                                if "text" in cuerpo and cuerpo["text"].lower() == "/adios":
-                                    print()  # reiniciariamos el bot para otra ocasion
-                                    telegram.send_menu(chat_id)
+                                        tarea = "w_password"
+                                elif tarea == "reg_hab":
+                                    if check_room_availability(cuerpo["text"]):
+                                        tarea = "g_hab"
+                                    else:
+                                        tarea = "w_hab"
+                                # esta funcion no devuelve nada, es solo para enviar los mensajes
+                                menu_handler(chat_id, msg_id, tarea, user)
+                                [user, updater_values[5]] = procesamiento_info(cuerpo, tarea, user)
+                                # print(f"tarea procesada:{updater_values[5]}")
                             except:
                                 logging.exception("Error traceback")
-                                try:
-                                    if cuerpo["new_chat_member"]["username"] == "TheRoomFatherBot":
-                                        logging.info('%s', "--------------------NEW CLIENT--------------------")
-                                        telegram.send_message("Hola, encantado de conocerle", cuerpo["chat"]["id"])
-                                        telegram.send_menu(cuerpo["chat"]["id"])
-                                except KeyError:
-                                    logging.exception("Error traceback")
-
                         elif "document" in cuerpo:
-
+                            telegram.send_message("lo siento, no entiendo, prueba otra vez", chat_id)
                             logging.info("document detected, but not sure what to do with it")
                         else:
-                            telegram.send_message("lo siento, no entiendo prueba otra vez", chat_id)
+                            telegram.send_message("lo siento, no entiendo, prueba otra vez", chat_id)
                             logging.warning("not sure what to do with this message")
                     except:
                         logging.exception("Error traceback")
+            else:
+                telegram.send_message("Lo siento, no puedo interaccionar con mensajes hasta la introduccion del "
+                                      "comando /start", chat_id)
 
 
 if __name__ == "__main__":
