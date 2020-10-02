@@ -135,4 +135,4 @@ build
 # Creds
 src/config.cfg
 config.cfg
-src/DB
+# src/DB # añadir cuando tengamos valores importantes
