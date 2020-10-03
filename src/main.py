@@ -32,6 +32,7 @@ class Main:
 
                 if tarea in ["inicio", "cliente_registrado"]:
                     inicio = True
+
             except KeyError:
                 logging.exception("Error traceback")
                 raise
@@ -64,8 +65,8 @@ class Main:
                                     else:
                                         tarea = "w_hab"
                                 # esta funcion no devuelve nada, es solo para enviar los mensajes
-                                menu_handler(chat_id, msg_id, tarea, user)
-                                [user, updater_values[5]] = procesamiento_info(cuerpo, tarea, user)
+                                menu_handler(chat_id, msg_id, tarea, inicio, user)
+                                [user, updater_values[5]] = procesamiento_info(cuerpo, tarea, inicio, user)
                                 # print(f"tarea procesada:{updater_values[5]}")
                             except:
                                 logging.exception("Error traceback")
@@ -80,6 +81,7 @@ class Main:
             else:
                 telegram.send_message("Lo siento, no puedo interaccionar con mensajes hasta la introduccion del "
                                       "comando /start", chat_id)
+                tarea = "texto"
 
 
 if __name__ == "__main__":

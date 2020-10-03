@@ -57,12 +57,15 @@ def cuerpo_handler(cuerpo, tarea_ant, tarea="texto"):
     if "message" in cuerpo:     # esto significa que es menu no mensaje de texto
         tarea = cuerpo["data"]
         cuerpo = cuerpo["message"]
+
     elif tarea == "atras":
         tarea = tarea_ant
         tarea_ant = "texto"
+
     else:
         tareas_texto = {"registro": "usuario", "usuario": "password", "w_hab": "reg_hab", "hab": "reg_hab",
-                        "w_password": "password", "texto": "texto", "inicio": "inicio", "reg_piso": "add_piso"}
+                        "w_password": "password", "texto": "texto", "inicio": "inicio", "inicio_admin": "inicio_admin",
+                        "reg_piso": "add_piso", "delete_client": "deleted_client"}
         tarea = tareas_texto[tarea]
 
     chat_id = cuerpo["chat"]["id"]

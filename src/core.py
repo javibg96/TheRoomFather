@@ -2,8 +2,10 @@ import logging
 from src.DB.DB_handler import *
 
 
-def procesamiento_info(cuerpo, tarea, usuario=None):
+def procesamiento_info(cuerpo, tarea, inicio, usuario=None):
     try:
+        if not inicio:
+            tarea = "texto"
         if tarea == "usuario":
             usuario[0] = cuerpo["from"]["id"]
             user = cuerpo["text"]
@@ -22,17 +24,23 @@ def procesamiento_info(cuerpo, tarea, usuario=None):
             usuario[3] = habitacion
             tarea = "reg_completado"
 
-        if tarea == "reinicio_room":
+        elif tarea == "reinicio_room":
             usuario[3] = None
             tarea = "reinicio"
 
-        if "add_piso":
+        if tarea == "add_piso":
             if "text" in cuerpo:
                 habitacion = cuerpo["text"].lower()
                 reg_room(habitacion)
 
-        if tarea == "reg_completado":
+        elif tarea == "deleted_client":
+            if "text" in cuerpo:
+                cliente = cuerpo["text"].lower()
+                delete_registro("clientes", cliente)
+
+        elif tarea == "reg_completado":
             registro_db(usuario)
+
         if "text" in cuerpo and cuerpo["text"].lower() == "/adios":
             tarea = "texto"
             usuario = [None, None, None, None, "Public"]

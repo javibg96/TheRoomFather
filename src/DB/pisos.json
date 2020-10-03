@@ -1,8 +1,14 @@
 ﻿{
-    "avenida de burgos 4": {
-        "ocupado": false
+    "666666666": {
+        "nombre": "Cliente de prueba",
+        "password": "123456789",
+        "permiso": "Admin",
+        "piso": "123456789"
     },
-    "calle alberto aguilera 1000": {
-        "ocupado": false
+    "927100626": {
+        "nombre": "Javier Blasco",
+        "password": "1234567",
+        "permiso": "Admin",
+        "piso": null
     }
 }

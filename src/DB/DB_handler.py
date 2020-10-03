@@ -25,7 +25,6 @@ def check_client_info(client_id):
 
 def get_client_info(client_id):
     if check_client_info(client_id):
-        logging.info("client already in database!")
         cliente = check_client_info(client_id)
         usuario = [client_id, cliente["nombre"], cliente["password"], cliente["piso"], cliente["permiso"]]
         tarea = "cliente_registrado"
@@ -60,10 +59,41 @@ def checkout(usuario):
 
 
 def reg_room(hab):
-    pisos_set = read_json("../src/DB/pisos.json")
-    piso = {hab: {"ocupado": false}}
-    pisos_set.update(piso)
-    write_json("../src/DB/pisos.json", pisos_set)
+    try:
+        pisos_set = read_json("../src/DB/pisos.json")
+        piso = {hab: {"ocupado": False}}
+        pisos_set.update(piso)
+        print(pisos_set)
+        write_json("../src/DB/pisos.json", pisos_set)
+    except:
+        logging.exception("error in reg_room traceback")
+
+
+def show_clients():
+    clients_set = read_json("../src/DB/clientes.json")
+    nombre_clientes = []
+    for cliente in clients_set.keys():
+        nombre_clientes.append(clients_set[cliente]["nombre"])
+    return nombre_clientes
+
+
+def delete_registro(db, registro):
+    print(f"REGISTROOO {registro}")
+    reg_found = False
+    deleted_id = 0
+    directory = f"../src/DB/{db}.json"
+    registro_set = read_json(directory)
+    if registro in registro_set:
+        registro_set.pop(registro)
+    else:
+        for element in registro_set.keys():
+            if registro == registro_set[element]["nombre"].lower():
+                reg_found = True
+                deleted_id = element
+    if reg_found:
+        print(registro_set[deleted_id]["nombre"])
+        registro_set.pop(deleted_id)
+    write_json(directory, registro_set)
 
 
 def read_json(directory):
