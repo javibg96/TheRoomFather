@@ -17,7 +17,7 @@ class Main:
         logging.info("STARTING BOT......")
         telegram = TelegramApi()
         inicio = False
-        user = [None, None, None, None]
+        user = [None, None, None, None, "Public"]
         tarea = "texto"
         client_flag = False
         updater_values = [None, False, None, 0, 0, tarea]
@@ -29,6 +29,7 @@ class Main:
                 tarea_ant = updater_values[5]
                 [updater_values, tarea_ant] = updater(telegram, updater_values, tarea_ant)
                 [cuerpo, chat_id, msg_id, tarea] = updater_values[2:6]
+
                 if tarea in ["inicio", "cliente_registrado"]:
                     inicio = True
             except KeyError:
@@ -48,6 +49,10 @@ class Main:
                                     if get_client_info(client_id):
                                         [user, tarea] = get_client_info(client_id)
                                         client_flag = True
+
+                                        if user[4] == "Admin" and tarea == "cliente_registrado":
+                                            print(user)
+                                            tarea = "inicio_admin"
                                 if "password" in tarea:
                                     if check_password(cuerpo["text"]):
                                         tarea = "g_password"

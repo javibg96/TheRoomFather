@@ -14,7 +14,7 @@
     "927100626": {
         "nombre": "Javier Blasco",
         "password": "1234567",
-        "permiso": "Public",
+        "permiso": "Admin",
         "piso": null
     }
 }

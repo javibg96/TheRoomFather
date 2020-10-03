@@ -27,7 +27,7 @@ def get_client_info(client_id):
     if check_client_info(client_id):
         logging.info("client already in database!")
         cliente = check_client_info(client_id)
-        usuario = [client_id, cliente["nombre"], cliente["password"], cliente["piso"]]
+        usuario = [client_id, cliente["nombre"], cliente["password"], cliente["piso"], cliente["permiso"]]
         tarea = "cliente_registrado"
         return usuario, tarea
 
@@ -57,6 +57,13 @@ def checkout(usuario):
     pisos_set[hab]["ocupado"] = False
     write_json("../src/DB/pisos.json", pisos_set)
     print(f"Piso {hab} liberado")
+
+
+def reg_room(hab):
+    pisos_set = read_json("../src/DB/pisos.json")
+    piso = {hab: {"ocupado": false}}
+    pisos_set.update(piso)
+    write_json("../src/DB/pisos.json", pisos_set)
 
 
 def read_json(directory):

@@ -21,14 +21,21 @@ def procesamiento_info(cuerpo, tarea, usuario=None):
             habitacion = None
             usuario[3] = habitacion
             tarea = "reg_completado"
+
         if tarea == "reinicio_room":
             usuario[3] = None
             tarea = "reinicio"
+
+        if "add_piso":
+            if "text" in cuerpo:
+                habitacion = cuerpo["text"].lower()
+                reg_room(habitacion)
+
         if tarea == "reg_completado":
             registro_db(usuario)
         if "text" in cuerpo and cuerpo["text"].lower() == "/adios":
             tarea = "texto"
-            usuario = [None, None, None, None]
+            usuario = [None, None, None, None, "Public"]
             print()  # reiniciariamos el bot para otra ocasion
     except:
         logging.exception("error traceback from procesamiento")

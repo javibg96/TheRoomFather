@@ -62,7 +62,7 @@ def cuerpo_handler(cuerpo, tarea_ant, tarea="texto"):
         tarea_ant = "texto"
     else:
         tareas_texto = {"registro": "usuario", "usuario": "password", "w_hab": "reg_hab", "hab": "reg_hab",
-                        "w_password": "password", "texto": "texto", "inicio": "inicio"}
+                        "w_password": "password", "texto": "texto", "inicio": "inicio", "reg_piso": "add_piso"}
         tarea = tareas_texto[tarea]
 
     chat_id = cuerpo["chat"]["id"]
@@ -70,5 +70,6 @@ def cuerpo_handler(cuerpo, tarea_ant, tarea="texto"):
 
     if cuerpo["text"].lower() == "/start":
         logging.info("Wake up protocol, let's check if is someone known")
+        tarea = "inicio"
 
     return chat_id, msg_id, tarea_ant, tarea
