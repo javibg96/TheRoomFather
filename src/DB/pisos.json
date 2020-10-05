@@ -1,14 +1,20 @@
 ﻿{
-    "666666666": {
-        "nombre": "Cliente de prueba",
-        "password": "123456789",
-        "permiso": "Admin",
-        "piso": "123456789"
+    "calle alberto aguilera 1000": {
+        "ocupado": false
     },
-    "927100626": {
-        "nombre": "Javier Blasco",
-        "password": "1234567",
-        "permiso": "Admin",
-        "piso": null
+    "calle avenida de burgos 4": {
+        "ocupado": false
+    },
+    "calle guzman el bueno 234": {
+        "ocupado": false
+    },
+    "calle principe de vergara 2000": {
+        "ocupado": false
+    },
+    "calle rafaela bergamon 1235": {
+        "ocupado": false
+    },
+    "calle sinieso delgado 1500": {
+        "ocupado": true
     }
 }

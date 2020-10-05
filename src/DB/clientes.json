@@ -1,4 +1,10 @@
 ﻿{
+    "555555555": {
+        "nombre": "Cliente de prueba2",
+        "password": "123456789",
+        "permiso": "Public",
+        "piso": "calle sinieso delgado 1500"
+    },
     "666666666": {
         "nombre": "Cliente de prueba",
         "password": "123456789",
@@ -8,7 +14,7 @@
     "927100626": {
         "nombre": "Javier Blasco",
         "password": "1234567",
-        "permiso": "Admin",
+        "permiso": "Public",
         "piso": null
     }
 }
