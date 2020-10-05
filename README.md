@@ -26,5 +26,6 @@ pip3 install dist/TheRoomFather-x.x.tar.gz
 
 RoadMap
 ==================
-* `Crear menu de registro y de entrada para usuarios`
-* `Relacion usuario-habitacion -> branch: feature/relDBs`
+* `Obtener DBs de verdad para testing`
+* `Crear menus dependiendo de admin public o servicios`
+* `crear dataframes con datos de los pisos al final del dia para informes y dashboards`

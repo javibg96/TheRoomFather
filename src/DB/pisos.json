@@ -1,8 +1,20 @@
 ﻿{
-    "avenida de burgos 4": {
-        "ocupado": false
-    },
     "calle alberto aguilera 1000": {
         "ocupado": false
+    },
+    "calle avenida de burgos 4": {
+        "ocupado": false
+    },
+    "calle guzman el bueno 234": {
+        "ocupado": false
+    },
+    "calle principe de vergara 2000": {
+        "ocupado": false
+    },
+    "calle rafaela bergamon 1235": {
+        "ocupado": false
+    },
+    "calle sinieso delgado 1500": {
+        "ocupado": true
     }
 }
