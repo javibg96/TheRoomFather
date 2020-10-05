@@ -1,11 +1,19 @@
 from src.telegram_api_handler import TelegramApi
-from src.DB.DB_handler import registro_db, checkout, get_client_info
+from src.DB.DB_handler import registro_db, checkout, get_client_info, show_clients
 
 
-def send_initial_menu(chat_id):
+def initial_menu(chat_id):
     pregunta = "Bienvenido a nuestro bot de ayuda, encantado de conocerte, ¿Qué quieres hacer?"
     keyBoard = '{"inline_keyboard": [[{"text": "Registro", "callback_data": "registro"}], [{"text": "otro", ' \
                '"callback_data": "otro"}]]} '
+    TelegramApi().send_message(pregunta, chat_id, keyBoard)
+
+
+def admin_menu(chat_id):
+    pregunta = "ADMIN MENU -- ¿Qué quieres hacer?"
+    keyBoard = '{"inline_keyboard": [[{"text": "Registrar propiedad", "callback_data": "reg_piso"}], ' \
+               '[{"text": "Eliminar cliente", "callback_data": "delete_client"}],' \
+               '[{"text": "Informe semanal", "callback_data": "informe"}]]} '
     TelegramApi().send_message(pregunta, chat_id, keyBoard)
 
 
@@ -64,10 +72,16 @@ def registered_client_menu(chat_id, tarea, room, client_name=None):
     TelegramApi().send_message(pregunta, chat_id, keyBoard)
 
 
-def menu_handler(chat_id, msg_id, option, usuario):
+def menu_handler(chat_id, msg_id, option, inicio, usuario):
     print(f"menu option: {option}")
+    if not inicio:
+        TelegramApi().delete_message(chat_id, msg_id)
     if option == "inicio":
-        send_initial_menu(chat_id)
+        initial_menu(chat_id)
+
+    if option == "inicio_admin":
+        TelegramApi().delete_message(chat_id, msg_id)
+        admin_menu(chat_id)
 
     elif option == "registro" or "password" in option or "usuario" in option or option in ["hab", "w_hab", "nohab"]:
         registro(chat_id, msg_id, option)
@@ -84,6 +98,17 @@ def menu_handler(chat_id, msg_id, option, usuario):
         usuario[3] = "Piso temporal"        # se coloca el de verdad al llegar a la siguiente funcion
         print(usuario)
         registered_client_menu(chat_id, option, usuario[3], usuario[1])
+
+    elif option == "add_piso":
+        texto = "Piso añadido con exito a la base de datos"
+        keyBoard = '{"inline_keyboard":[[{"text": "<< Atrás", "callback_data": "inicio_admin"}]]}'
+        TelegramApi().send_message(texto, chat_id, keyBoard)
+
+    elif option == "deleted_client":
+        texto = "Cliente eliminado con exito"
+        keyBoard = '{"inline_keyboard":[[{"text": "<< Atrás", "callback_data": "inicio_admin"}]]}'
+        TelegramApi().send_message(texto, chat_id, keyBoard)
+
     else:
         keyBoard = '{"inline_keyboard":[[{"text": "<< Atrás", "callback_data": "reinicio"}]]}'
 
@@ -99,6 +124,7 @@ def menu_handler(chat_id, msg_id, option, usuario):
                        '[{"text": "Electricista", "callback_data": "electricista"}],' \
                        '[{"text": "Pintor", "callback_data": "pintor"}],' \
                        '[{"text": "Cerrajero", "callback_data": "cerrajero"}]]}'
+            # crear archivo con lista de servicios para poder añadir servicios por el admin y recorrerlos con bucle for
 
         elif option in ["fontanero", "electricista", "pintor", "cerrajero"]:
             texto = f"en seguida mandamos a un {option} a su domicilio, que tenga un bien día"
@@ -111,6 +137,17 @@ def menu_handler(chat_id, msg_id, option, usuario):
             texto = "Perfecto, ya hemos actualizado la base de datos, que tenga un buen día"
             keyBoard = '{"inline_keyboard":[[{"text": "<< Atrás", "callback_data": "reinicio"}]]}'
 
+        elif option == "reg_piso":
+            texto = "Introduce la direccion del piso a añadir"
+            keyBoard = '{"inline_keyboard":[[{"text": "<< Atrás", "callback_data": "inicio_admin"}]]}'
+
+        elif option == "delete_client":
+            nom_clientes = show_clients()
+            texto = "Introduce el nombre del cliente a eliminar, posibilidades: "
+            for nombre in nom_clientes:
+                texto = texto + nombre + ", "
+            texto = texto + " (copia y pega para evitar errores)"
+            keyBoard = '{"inline_keyboard":[[{"text": "<< Atrás", "callback_data": "inicio_admin"}]]}'
         else:
             texto = "Escriba en que puedo ayudarle a ver si puedo encontrar alguna solución"
 
